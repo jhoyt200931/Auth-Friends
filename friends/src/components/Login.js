@@ -1,8 +1,8 @@
 import React, { useState } from 'react';
+import { axiosWithAuth } from '../api/axiosWithAuth';
 
 
-
-const Login = () =>{
+const Login = (props) =>{
     
     const [credentials, setCredentials] = useState({
         username: '',
@@ -19,11 +19,20 @@ const Login = () =>{
 
     const handleSubmit = (e) => {
         e.preventDefault();
+        axiosWithAuth().post('/login', credentials)
+            .then(res => {
+                console.log(res);
+                localStorage.setItem('token', res.data.payload);
+                props.history.push('/friends');
+            })
+            .catch(err => {
+                console.error(err);
+            });
     }
 
     return (
         <div>
-            <form onSubmit={handleSubmit}>
+            <form>
                 <label htmlFor='username'>
                     Username: 
                     <input type='text' name='username' id='username' value={credentials.username} onChange={handleChange} />
@@ -32,6 +41,7 @@ const Login = () =>{
                     Password:
                     <input type='password' name='password' id='password' value={credentials.password} onChange={handleChange} />
                 </label>
+                <button type='submit' onClick={handleSubmit} >Login</button>
             </form>
         </div>
     )
